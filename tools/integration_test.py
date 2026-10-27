@@ -62,6 +62,27 @@ def main():
                'ha-reverse-ssh-fixture:dev')
         wait_for(lambda: docker('exec', SERVER, 'test', '-f', '/fixture/data/options.json',
                                 check=False).returncode == 0, 'fixture initialization')
+        # Initial setup stays alive with no credentials, stops cleanly, and
+        # picks up later uploads without restarting the client.
+        server_python("from pathlib import Path; p=Path('/fixture/config'); "
+                      "[(p/n).rename(p/(n+'.saved')) for n in ('id_ed25519','known_hosts')]")
+        start_client()
+        wait_for(lambda: 'Setup: waiting' in docker('logs', CLIENT).stderr,
+                 'initial setup waits for credentials')
+        assert docker('inspect', '--format', '{{.State.Running}}', CLIENT).stdout.strip() == 'true'
+        assert not probe(), 'Unexpected tunnel before credential upload'
+        docker('stop', '--time', '20', CLIENT)
+        assert docker('inspect', '--format', '{{.State.ExitCode}}', CLIENT).stdout.strip() == '0'
+        print('PASS: clean stop during setup wait', flush=True)
+        remove_client()
+        start_client()
+        wait_for(lambda: 'Setup: waiting' in docker('logs', CLIENT).stderr,
+                 'setup waits after restart')
+        server_python("from pathlib import Path; p=Path('/fixture/config'); "
+                      "[(p/(n+'.saved')).rename(p/n) for n in ('id_ed25519','known_hosts')]")
+        wait_for(probe, 'credential upload starts real tunnel without client restart')
+        docker('stop', '--time', '20', CLIENT)
+        remove_client()
         for autossh in (False, True):
             mode = 'autossh' if autossh else 'ssh'
             server_python("import json; from pathlib import Path; "
