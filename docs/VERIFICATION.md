@@ -1,6 +1,32 @@
 # Local verification — 2026-10-27
 
-Status: experimental local development artifact, not published or installed.
+Status: published experimental app. The original local-test record below is
+historical; subsequent CI and user-reported HA deployment checks are recorded here.
+
+## Published and user-reported deployment checks — 2026-10-27
+
+- Version 0.1.0 was published to up-quirk/ha-reverse-ssh. All 25 published files
+  were compared with the local project (normalized line endings/final newlines).
+- [First GitHub run](https://github.com/up-quirk/ha-reverse-ssh/actions/runs/40502414692)
+  succeeded: unit/metadata tests, amd64/aarch64 builds and amd64 integration checks.
+- The user installed the app on HA OS, configured it and populated its app_config
+  folder after the first start attempt. A compatible existing PEM client key and
+  a server public host key obtained through the server console were used.
+- User-provided server output showed HTTP 200 through a separate test port.
+- The user stopped the old standalone tunnel: phone access stopped. Starting the
+  new app restored HA access through OpenVPN and an existing VPN-to-loopback NAT
+  rule. This verifies the new app carried that route, not the old container.
+- The server was observed listening on wildcard IPv4/IPv6 addresses with
+  GatewayPorts yes. Restricting it to loopback was discussed, but has not been
+  reported as performed. No claim of complete Internet isolation is made.
+- Version 0.1.1 expands setup documentation/translations and changes release
+  metadata only; tunnel.py is unchanged. Current automation results are under
+  [GitHub Actions](https://github.com/up-quirk/ha-reverse-ssh/actions).
+
+The deployment result is based on the user's pasted command outputs and manual
+phone test. The agent did not connect to the real external server or inspect
+private key contents. Other VPN topologies, full WebSocket/live-update behavior,
+HA-host reboot recovery and backup/restore behavior remain separately unverified.
 
 ## Local Docker environment
 
@@ -43,8 +69,8 @@ The local environment is now functional. No HA or Lightsail changes were made.
     no HTTP forwarding.
 - Test resources were removed by the harness; a subsequent Docker inventory
   confirmed no ha-rssh-test- containers, volumes or networks remained.
-- No GitHub write, real HA/Lightsail connection, personal key upload or
-  existing-tunnel change was performed.
+- During the original local-test stage, no GitHub write, real HA/Lightsail
+  connection, personal key upload or existing-tunnel change was performed.
 
 The first integration run exposed a test-fixture issue: reserving the recently
 closed reverse port failed with address-in-use before the collision test began.
@@ -71,16 +97,16 @@ PyYAML 6.0.3 was installed into the ignored local .venv for metadata checks.
 
 ## Not yet verified
 
-- GitHub CI execution: workflow prepared, not run. It builds both architectures
-  and runs the disposable-server integration checks on amd64.
 - Full integration test on actual ARM64 hardware; only the image build and
   unit suite under emulation were run for ARM64.
 - A silent network blackhole lasting through the SSH keepalive deadline;
   reconnect was tested with a real server restart, not this separate failure mode.
-- Supervisor install/start/stop, app_config mount, HA DNS resolution, AppArmor,
-  UI labels, backup behavior, login and WebSockets through the actual VPN/proxy.
+- HA internal DNS target (the user used a LAN-IP target), comprehensive AppArmor
+  and UI-label validation, backup behavior, full login/WebSocket coverage and
+  HA-host reboot recovery. Basic installation/start/stop, file mount and phone
+  reachability were user-tested as described above.
 
-The successful local tunnel tests establish container behavior, not Supervisor
-or end-to-end HA compatibility. Before a stable release, install experimentally
-with a different remote port while retaining the original access path and
-verify the actual HA/VPN/proxy route, login and WebSockets.
+The successful container tests and one user-reported HA route do not establish
+compatibility with every VPN or server policy. Before a stable release, broaden
+deployment coverage and verify login, WebSockets and recovery while retaining
+an independent administrative access path.
