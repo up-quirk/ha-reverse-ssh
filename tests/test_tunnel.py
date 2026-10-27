@@ -75,6 +75,38 @@ class TunnelTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 tunnel.prepare_credentials(source, Path(tmp) / 'runtime')
 
+    def test_setup_waits_for_both_nonempty_files_then_copies(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source, dest = Path(tmp) / 'config', Path(tmp) / 'runtime'
+            source.mkdir()
+            (source / 'id_ed25519').write_text('private-test-only')
+            (source / 'known_hosts').write_text('')
+            class Stop:
+                waits = 0
+                def is_set(self):
+                    return False
+                def wait(self, seconds):
+                    self.waits += 1
+                    (source / 'known_hosts').write_text('host public-test-only')
+            stop = Stop()
+            with self.assertLogs('reverse_ssh', level='INFO') as logs:
+                self.assertTrue(tunnel.wait_for_credentials(source, dest, stop))
+            self.assertEqual(stop.waits, 1)
+            self.assertEqual((dest / 'known_hosts').read_text(), 'host public-test-only\n')
+            self.assertNotIn('private-test-only', str(logs.output))
+
+    def test_setup_wait_is_interruptible_and_does_not_create_keys(self):
+        import threading
+        with tempfile.TemporaryDirectory() as tmp:
+            source, dest = Path(tmp) / 'config', Path(tmp) / 'runtime'
+            source.mkdir()
+            stop = threading.Event()
+            with patch.object(stop, 'wait', side_effect=lambda _: stop.set()), \
+                 self.assertLogs('reverse_ssh', level='INFO'):
+                self.assertFalse(tunnel.wait_for_credentials(source, dest, stop))
+            self.assertEqual(list(source.iterdir()), [])
+            self.assertFalse(dest.exists())
+
     @unittest.skipUnless(os.name == 'posix', 'Symlink creation requires privileges on Windows')
     def test_symlink_credentials_rejected(self):
         for linked in ('id_ed25519', 'known_hosts'):
@@ -98,7 +130,7 @@ class TunnelTests(unittest.TestCase):
                           if result == 'invalid' else
                           {'side_effect': tunnel.subprocess.TimeoutExpired('ssh-keygen', 10)})
                 with patch.object(Path, 'read_text', return_value=json.dumps(self.options())), \
-                     patch.object(tunnel, 'prepare_credentials'), \
+                     patch.object(tunnel, 'wait_for_credentials', return_value=True), \
                      patch.object(tunnel.signal, 'signal'), \
                      patch.object(tunnel.os, 'umask'), \
                      patch.object(tunnel.subprocess, 'run', **kwargs), \
