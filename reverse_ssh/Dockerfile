@@ -1,6 +1,6 @@
 FROM alpine:3.22
 ARG BUILD_ARCH
-ARG BUILD_VERSION=0.1.0
+ARG BUILD_VERSION=0.1.1
 LABEL io.hass.name="Reverse SSH Tunnel" \
       io.hass.description="Reverse SSH tunnel with optional autossh" \
       io.hass.type="addon" \

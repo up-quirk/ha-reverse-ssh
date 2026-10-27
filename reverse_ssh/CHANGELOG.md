@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1
+
+- Expanded German and English beginner guides with ASCII topology diagrams,
+  external VPN prerequisites, three access paths and setup/test/migration recipes.
+- Explained first-start app_config folder creation, both credential file formats
+  and the difference between client keys and server host keys.
+- Corrected bind-address help: GatewayPorts yes can override a loopback request.
+- Use GET for HA checks; document the expected HEAD/405 response.
+- No tunnel runtime logic changes.
+
 ## 0.1.0
 
 - Initial experimental version with optional autossh and reconnect supervision.
