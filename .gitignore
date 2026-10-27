@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+secrets/
+id_*
+known_hosts
+*.pem
+*.key
+.env
+test-results/
+.test-tmp/
