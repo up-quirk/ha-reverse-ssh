@@ -8,7 +8,10 @@ configuration:
     name: SSH-Benutzer
   remote_bind_address:
     name: Bind-Adresse auf dem Server
-    description: Mit 127.0.0.1 ist der Port nur auf dem SSH-Server selbst erreichbar.
+    description: >-
+      Gewünschte Listener-Adresse auf dem SSH-Server. 127.0.0.1 für lokalen
+      Proxy oder VPN-Weiterleitung auf Loopback; VPN-IP für direkten VPN-Zugriff.
+      GatewayPorts auf dem Server kann diese Auswahl überschreiben. Siehe Anleitung.
   remote_port:
     name: Port auf dem Server
   target_host:

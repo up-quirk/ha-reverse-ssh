@@ -8,7 +8,10 @@ configuration:
     name: SSH user
   remote_bind_address:
     name: Bind address on server
-    description: Default 127.0.0.1 permits access only from the SSH server itself.
+    description: >-
+      Requested listener address on the SSH server. Use 127.0.0.1 for a local
+      proxy or VPN forwarding to loopback; use the VPN IP for direct VPN access.
+      The server GatewayPorts setting can override this choice. See setup guide.
   remote_port:
     name: Port on server
   target_host:
