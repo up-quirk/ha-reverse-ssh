@@ -3,6 +3,21 @@
 Status: published experimental app. The original local-test record below is
 historical; subsequent CI and user-reported HA deployment checks are recorded here.
 
+## Version 0.1.2 local checks
+
+- amd64 and aarch64 Docker builds succeeded. All 13 unit tests passed under
+  Linux on both architectures (aarch64 under emulation); Windows passed with
+  the privileged symlink test skipped. Metadata/YAML checks passed.
+- Real isolated amd64 SSH-server tests passed: initial missing-file wait,
+  clean stop during setup, automatic tunnel start after later file upload,
+  HTTP forwarding in both SSH/autossh modes, reconnect after server restart,
+  occupied-port rejection/recovery, wrong host-key rejection and encrypted-key rejection.
+- Review found no blocking issues. Non-atomic uploads may expose a partial key;
+  if key parsing fails, finish the upload and restart, as documented.
+- Native configuration help is implemented as the SSH-host field description.
+  Frontend source supports field descriptions but no custom app information box.
+  No live HA upgrade or frontend-rendering test was performed for this version.
+
 ## Published and user-reported deployment checks — 2026-10-27
 
 - Version 0.1.0 was published to up-quirk/ha-reverse-ssh. All 25 published files
