@@ -5,7 +5,8 @@ Create an outbound SSH connection to a server you control and forward a port
 on that server back to Home Assistant. Works with Lightsail or any compatible
 OpenSSH server; a VPN on that server is optional.
 
-**Status:** experimental version 0.1.0. Not yet tested on Home Assistant.
+**Status:** experimental version 0.1.1. A real HA/OpenVPN/NAT deployment has
+been manually verified; other VPN/routing setups still require their own tests.
 Local amd64/arm64 builds, Linux unit tests and amd64 disposable-SSH-server
 integration tests have passed; see the verification record below.
 The Supervisor builds the image locally; no prebuilt container image is
