@@ -1,7 +1,13 @@
 configuration:
   ssh_host:
     name: SSH host
-    description: Reachable server IP or DNS name (not a URL).
+    description: >-
+      Reachable server IP or DNS name (not a URL). Setup: after its first start,
+      the app waits for two files in app_configs/<repository-id>_reverse_ssh/.
+      id_ed25519 contains your private SSH login key without a passphrase;
+      known_hosts contains the verified public host key of the server.
+      Do not paste keys into this form. Instructions and file examples:
+      https://github.com/up-quirk/ha-reverse-ssh/blob/main/reverse_ssh/DOCS.md#6-fill-the-two-files
   ssh_port:
     name: SSH port
   ssh_user:
