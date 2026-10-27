@@ -1,0 +1,21 @@
+configuration:
+  ssh_host:
+    name: SSH host
+    description: Reachable server IP or DNS name (not a URL).
+  ssh_port:
+    name: SSH port
+  ssh_user:
+    name: SSH user
+  remote_bind_address:
+    name: Bind address on server
+    description: Default 127.0.0.1 permits access only from the SSH server itself.
+  remote_port:
+    name: Port on server
+  target_host:
+    name: Destination host
+    description: homeassistant reaches HA Core; localhost means this app container.
+  target_port:
+    name: Destination port
+  use_autossh:
+    name: Use autossh
+    description: Both modes reconnect; autossh also supervises its SSH child.
