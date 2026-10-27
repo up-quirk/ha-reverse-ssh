@@ -1,0 +1,34 @@
+name: Reverse SSH Tunnel
+version: 0.1.0
+slug: reverse_ssh
+description: Reverse SSH tunnel with optional autossh and strict host verification
+url: https://github.com/up-quirk/ha-reverse-ssh
+arch:
+  - amd64
+  - aarch64
+startup: application
+stage: experimental
+timeout: 30
+boot: auto
+init: true
+map:
+  - type: app_config
+    read_only: true
+options:
+  ssh_host: ""
+  ssh_port: 22
+  ssh_user: ha-tunnel
+  remote_bind_address: 127.0.0.1
+  remote_port: 18123
+  target_host: homeassistant
+  target_port: 8123
+  use_autossh: true
+schema:
+  ssh_host: str
+  ssh_port: port
+  ssh_user: str
+  remote_bind_address: str
+  remote_port: port
+  target_host: str
+  target_port: port
+  use_autossh: bool
