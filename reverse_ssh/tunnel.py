@@ -69,6 +69,36 @@ def bracket(value):
     return f'[{value}]' if ':' in value else value
 
 
+def wait_for_credentials(source, dest, stop, retry_seconds=5):
+    last_missing = None
+    while not stop.is_set():
+        missing = []
+        for name in ('id_ed25519', 'known_hosts'):
+            path = source / name
+            if path.is_symlink() or (path.exists() and not path.is_file()):
+                raise ValueError(f'{name} must be a regular file, not a symlink')
+            try:
+                data = path.read_bytes()
+            except FileNotFoundError:
+                missing.append(name)
+                continue
+            if len(data) > 1024 * 1024:
+                raise ValueError(f'{name} must be at most 1 MiB')
+            if not data.strip():
+                missing.append(name)
+        if not missing:
+            prepare_credentials(source, dest)
+            return True
+        if missing != last_missing:
+            LOG.info('Setup: waiting for nonempty %s in the app_configs '
+                     '<repository-id>_reverse_ssh folder (inside app: /config). '
+                     'Help: https://github.com/up-quirk/ha-reverse-ssh/blob/main/reverse_ssh/DOCS.md',
+                     ', '.join(missing))
+            last_missing = missing
+        stop.wait(retry_seconds)
+    return False
+
+
 def command(options, credentials):
     forward = (f"{bracket(options['remote_bind_address'])}:{options['remote_port']}:"
                f"{bracket(options['target_host'])}:{options['target_port']}")
@@ -113,9 +143,10 @@ def main():
     for sig in (signal.SIGTERM, signal.SIGINT):
         signal.signal(sig, lambda *_: stop.set())
     try:
-        options = validate(json.loads(Path('/data/options.json').read_text()))
         credentials = Path('/run/reverse-ssh')
-        prepare_credentials(Path('/config'), credentials)
+        if not wait_for_credentials(Path('/config'), credentials, stop):
+            return 0
+        options = validate(json.loads(Path('/data/options.json').read_text()))
         # Parse the key locally: fail before repeatedly trying an invalid or
         # passphrase-protected key. Never print key contents or its public key.
         check = subprocess.run(['ssh-keygen', '-y', '-P', '', '-f',

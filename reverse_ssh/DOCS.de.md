@@ -259,10 +259,15 @@ Zielhost ist aus der App erreichbar, normalerweise `homeassistant`, alternativ
 die HA-LAN-IP. `localhost` wäre die App selbst. Bei eigenem HA-TLS den passenden
 Port verwenden; die App transportiert TCP, sie wandelt HTTP nicht in HTTPS um.
 
-**Der Supervisor legt den Ordner beim ersten Startversuch an.** Nach dem
-Speichern einmal Starten klicken. Ohne Schlüsseldateien beendet sich die App
-erwartungsgemäß, bevor sie eine SSH-Verbindung aufbaut. Einen aktivierten
-Watchdog bis zum Abschluss der Einrichtung gegebenenfalls ausschalten.
+**Der Supervisor legt den Ordner beim ersten Start an.** Nach dem Speichern
+einmal Starten klicken. Ab Version 0.1.2 bleibt die App aktiv und wartet auf
+beide nicht leeren Dateien. Im Protokoll steht `Setup: waiting ...`; es wird
+noch keine SSH-Verbindung aufgebaut. Nach dem Ablegen beider Dateien prüft
+die App den Schlüssel und startet den Tunnel automatisch (innerhalb etwa
+fünf Sekunden). Fehlende oder leere Dateien sind in dieser Phase kein Fehler.
+Die Konfigurationsseite zeigt beim SSH-Host einen Einrichtungshinweis mit
+Dateinamen und Hilfeadresse. HA unterstützt dort keine eigene Infobox;
+je nach Frontend-Version ist die Adresse als Text zu kopieren.
 
 Über Samba oder einen geeigneten Dateieditor öffnen:
 
@@ -276,7 +281,7 @@ Es heißt **`app_configs`**, nicht `apps_conf` und nicht der allgemeine HA-Ordne
 `config`. Bei diesem Repository heißt der Unterordner üblicherweise
 `3aff0a81_reverse_ssh`; Forks/andere Repositories haben andere IDs. Die ID steht
 auch in der URL der HA-App-Seite. Lokale Installation: `local_reverse_ssh`.
-Innerhalb der App heißt der Ordner `/config`. Nach dem Startversuch Ansicht
+Innerhalb der App heißt der Ordner `/config`. Nach dem ersten Start Ansicht
 aktualisieren, wenn der Ordner noch nicht angezeigt wird.
 
 ## 6. Die beiden Dateien befüllen
@@ -332,7 +337,9 @@ Bei DNS-Namen muss genau der konfigurierte Name stehen. Für SSH-Port `2222`:
 `ssh-keyscan` sammelt nur Kandidaten. Die Identität anhand des Fingerabdrucks
 aus einer unabhängigen vertrauenswürdigen Konsole bestätigen. Hostkey-Prüfung
 nicht abschalten. Dateien ohne zusätzliche `.txt`-Endung speichern. CRLF wird
-in Laufzeitkopien normalisiert. Nach jeder Dateiänderung die App neu starten.
+in Laufzeitkopien normalisiert. Nach Dateiänderungen an einem bereits gestarteten
+Tunnel die App neu starten. Ein ungültiger oder passphrasegeschützter Schlüssel
+beendet die App mit einer Fehlermeldung; nach der Korrektur erneut starten.
 
 ## 7. Starten und testen
 

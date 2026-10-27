@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+- Keep the first start running while credential files are missing or empty;
+  start the tunnel automatically after both files are supplied.
+- Explain credential files and link the setup guide in native SSH-host field help
+  (Home Assistant does not provide a custom configuration-page information box).
+- Keep strict host verification and reject invalid/passphrase-protected keys.
+
 ## 0.1.1
 
 - Expanded German and English beginner guides with ASCII topology diagrams,

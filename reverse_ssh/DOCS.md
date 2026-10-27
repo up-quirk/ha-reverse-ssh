@@ -258,9 +258,14 @@ from the app: usually homeassistant, alternatively HA's LAN IP. localhost would
 mean the app itself. If HA uses TLS, set the corresponding port; this app
 transports TCP and does not convert HTTP to HTTPS.
 
-**Supervisor creates the folder on the first start attempt.** After saving,
-click Start once. Without the files the app is expected to exit before making
-any SSH connection. Disable an enabled watchdog during initial setup if needed.
+**Supervisor creates the folder on the first start.** After saving, click Start
+once. Since version 0.1.2 the app stays running and waits for both nonempty files.
+The log shows `Setup: waiting ...`; no SSH connection is made yet. After both
+files are uploaded, the app checks the key and starts the tunnel automatically
+within about five seconds. Missing or empty files are not an error at this stage.
+The Configuration page includes setup help under SSH host, with file names and
+the help address. HA does not support a custom information box there; depending
+on the frontend version, copy the address as text.
 
 Open through Samba or a file editor with access to app configuration folders:
 
@@ -274,7 +279,7 @@ The folder is **app_configs**, not apps_conf and not HA's general config folder.
 For this repository the subfolder is normally 3aff0a81_reverse_ssh; forks/other
 repositories have a different ID. The HA app-page URL also includes its ID.
 Local installation: local_reverse_ssh. Inside the app this folder is /config.
-Refresh your file view after the first start attempt if the folder is missing.
+Refresh your file view after the first start if the folder is missing.
 
 ## 6. Fill the two files
 
@@ -327,7 +332,9 @@ If ssh_host is a DNS name, use that exact name. For SSH port 2222:
 ssh-keyscan only collects candidate keys. Confirm their identity against a
 fingerprint obtained through an independent trusted server console. Do not
 disable host verification. Save both files without an extra .txt extension.
-Windows CRLF is normalized in runtime copies. Restart after every file change.
+Windows CRLF is normalized in runtime copies. Restart after changing files for
+an already running tunnel. An invalid or passphrase-protected key stops the app
+with an error; correct the file and start again.
 
 ## 7. Start and verify
 

@@ -1,5 +1,5 @@
 name: Reverse SSH Tunnel
-version: 0.1.1
+version: 0.1.2
 slug: reverse_ssh
 description: Reverse SSH tunnel with optional autossh and strict host verification
 url: https://github.com/up-quirk/ha-reverse-ssh
